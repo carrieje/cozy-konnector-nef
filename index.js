@@ -1,5 +1,5 @@
 'use strict'
-const {BaseKonnector, log, requestFactory} = require('cozy-konnector-libs')
+const {BaseKonnector, log, requestFactory, updateOrCreate} = require('cozy-konnector-libs')
 const connection = require('./connection')
 const bluebird = require('bluebird')
 
@@ -117,6 +117,5 @@ function parseAmount (amount) {
 }
 
 function saveAccounts (accounts) {
-  console.log(accounts)
-  return accounts
+  return updateOrCreate(accounts, 'io.cozy.bank.accounts', ['institutionLabel', 'number'])
 }
