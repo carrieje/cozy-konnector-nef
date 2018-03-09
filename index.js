@@ -105,9 +105,7 @@ function fetchIBANs (accounts) {
         })
       }
     })
-  ).then((accounts) => {
-    return Promise.resolve(accounts)
-  })
+  )
 }
 
 function saveAccounts (accounts) {
