@@ -25,15 +25,12 @@ function start (fields) {
         .then(saveOperations)
     })
   )
-  .then(getDocuments)
 }
 
 function nop () {
   console.log('nop')
   return Promise.resolve([true])
 }
-
-const getDocuments = nop
 
 function validateLogin (statusCode, $, json) {
   return $('#welcomebar').length === 1
