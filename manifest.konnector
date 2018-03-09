@@ -1,0 +1,55 @@
+{
+  "version": "1.0.0",
+  "name": "Nef",
+  "type": "node",
+  "slug": "nef",
+  "source": "git://github.com/carrieje/cozy-konnector-nef.git",
+  "fields": {
+    "account": {
+      "doctype": "io.cozy.accounts",
+      "account_type": "nef",
+      "accountFormat": "login,password"
+    }
+  },
+  "locales": {
+    "fr": {
+      "description": "Récupère vos operation bancaires",
+      "permissions": {
+        "bank accounts": {
+          "description": "Utilisé pour sauvegarder le liste de vos comptes bancaires"
+        }
+      }
+    },
+    "en": {
+      "description": "Retrieves your bank operations",
+      "permissions": {
+        "bank accounts": {
+          "description": "Used to save the list of bank accounts"
+        }
+      }
+    }
+  },
+  "permissions": {
+    "bank account": {
+      "description": "Required to save the list of bank accounts",
+      "type": "io.cozy.bank.accounts"
+    },
+    "bank.operations": {
+      "description": "Required to save your bank operations",
+      "type": "io.cozy.bank.operations"
+    },
+    "accounts": {
+      "description": "Required to get the account's data",
+      "type": "io.cozy.accounts",
+      "verbs": ["GET"]
+    },
+    "files": {
+      "description": "Required to save the account statements",
+      "type": "io.cozy.files"
+    }
+  },
+  "developer": {
+    "name": "carrieje",
+    "url": "https://github.com/carrieje"
+  }
+}
