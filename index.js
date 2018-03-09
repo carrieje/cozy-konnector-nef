@@ -1,5 +1,11 @@
 'use strict'
-const {BaseKonnector, log, requestFactory, updateOrCreate, addData} = require('cozy-konnector-libs')
+const {
+  BaseKonnector,
+  addData,
+  log,
+  requestFactory,
+  updateOrCreate
+} = require('cozy-konnector-libs')
 const connection = require('./connection')
 const bluebird = require('bluebird')
 const moment = require('moment')
@@ -27,11 +33,6 @@ function start (fields) {
   )
 }
 
-function nop () {
-  console.log('nop')
-  return Promise.resolve([true])
-}
-
 function validateLogin (statusCode, $, json) {
   return $('#welcomebar').length === 1
 }
@@ -56,9 +57,9 @@ function parseAccounts () {
         // NOTE It is possible that the user has given their account a pseudo
         const label = $(item).children('div').eq(0).text().trim()
         return {
-          label: label,
+          label,
           balance: parseAmount($(item).find('.pc-formatted-amount-value').text()),
-          type: ( label.match(/Parts Sociales/) ? 'liability' : 'bank' ),
+          type: (label.match(/Parts Sociales/) ? 'liability' : 'bank'),
           number: $(item).attr('data-value')
         }
       })
