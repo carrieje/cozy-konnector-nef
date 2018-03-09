@@ -1,7 +1,9 @@
 'use strict'
-const {BaseKonnector, log, requestFactory, updateOrCreate} = require('cozy-konnector-libs')
+const {BaseKonnector, log, requestFactory, updateOrCreate, addData} = require('cozy-konnector-libs')
 const connection = require('./connection')
 const bluebird = require('bluebird')
+const moment = require('moment')
+moment.locale('fr')
 
 const baseUrl = `https://espace-client.lanef.com/templates`
 module.export = new BaseKonnector(start)
@@ -17,10 +19,10 @@ function start (fields) {
   .then(parseAccounts)
   .then(fetchIBANs)
   .then(saveAccounts)
-  .then(comptes =>
-    bluebird.each(comptes, compte => {
-      return fetchOperations(compte)
-        .then(operations => saveOperations(compte, operations))
+  .then(accounts =>
+    bluebird.each(accounts, account => {
+      return fetchOperations(account)
+        .then(saveOperations)
     })
   )
   .then(getDocuments)
@@ -31,8 +33,6 @@ function nop () {
   return Promise.resolve([true])
 }
 
-const fetchOperations = nop
-const saveOperations = nop
 const getDocuments = nop
 
 function validateLogin (statusCode, $, json) {
@@ -116,6 +116,56 @@ function parseAmount (amount) {
   return parseFloat(amount.trim().replace('\xa0', '').replace(',', '.'))
 }
 
+function parseDate (date) {
+  return moment(date, 'D MMM YYYY').unix() // TODO Check confidence over TZ
+}
+
 function saveAccounts (accounts) {
   return updateOrCreate(accounts, 'io.cozy.bank.accounts', ['institutionLabel', 'number'])
+}
+
+function fetchOperations (account) {
+  log('info', `Gettings operations for ${account.label} over the last 10 years`)
+
+  const params = {
+    AccNum: account.number,
+    uniqueKey: `detailContent_${account.number}`,
+    startDate: moment().subtract(10, 'year').format('YYYY-MM-DD'),
+    endDate: moment().format('YYYY-MM-DD'),
+    orderBy: 'TRANSACTION_DATE_DESCENDING',
+    page: '1',
+    screenSize: 'LARGE',
+    showBalance: true,
+    viewMode: 'GRID',
+    source: '',
+    transactionCode: ''
+  }
+
+  return rq({
+    uri: `${baseUrl}/account/accountActivityListWidget.cfm`,
+    method: 'POST',
+    form: {
+      ...params
+    }
+  }).then($ => {
+    const rows = Array.from($('table tbody').children('tr.activity-data-rows'))
+    return Promise.resolve(
+      rows.map(row => {
+        const cells = Array.from($(row).children('td')).map(cell => $(cell).text().trim())
+        return {
+          label: cells[5],
+          type: 'none', // TODO parse the labels for that
+          date: parseDate(cells[2]),
+          dateOperation: parseDate(cells[1]),
+          amount: parseAmount(cells[4]),
+          currency: 'EUR',
+          account: account._id
+        }
+      })
+    )
+  })
+}
+
+function saveOperations (operations) {
+  return addData(operations, 'io.cozy.bank.operations')
 }
