@@ -110,14 +110,6 @@ function fetchIBANs (accounts) {
   })
 }
 
-function parseAmount (amount) {
-  return parseFloat(amount.trim().replace('\xa0', '').replace(',', '.'))
-}
-
-function parseDate (date) {
-  return moment(date, 'D MMM YYYY').unix() // TODO Check confidence over TZ
-}
-
 function saveAccounts (accounts) {
   return updateOrCreate(accounts, 'io.cozy.bank.accounts', ['institutionLabel', 'number'])
 }
@@ -166,4 +158,12 @@ function fetchOperations (account) {
 
 function saveOperations (operations) {
   return addData(operations, 'io.cozy.bank.operations')
+}
+
+function parseAmount (amount) {
+  return parseFloat(amount.trim().replace('\xa0', '').replace(',', '.'))
+}
+
+function parseDate (date) {
+  return moment(date, 'D MMM YYYY').unix() // TODO Check confidence over TZ
 }
