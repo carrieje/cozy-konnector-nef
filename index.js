@@ -8,8 +8,9 @@ const {
 } = require('cozy-konnector-libs')
 const connection = require('./connection')
 const bluebird = require('bluebird')
-const moment = require('moment')
+const moment = require('moment-timezone')
 moment.locale('fr')
+moment.tz.setDefault('Europe/Paris')
 
 const baseUrl = `https://espace-client.lanef.com/templates`
 module.export = new BaseKonnector(start)
@@ -163,5 +164,5 @@ function parseAmount (amount) {
 }
 
 function parseDate (date) {
-  return moment(date, 'D MMM YYYY').unix() // TODO Check confidence over TZ
+  return moment.tz(date, 'D MMM YYYY', 'Europe/Paris').format()
 }
