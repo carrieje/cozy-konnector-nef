@@ -61,7 +61,7 @@ function parseAccounts () {
           label,
           balance: parseAmount($(item).find('.pc-formatted-amount-value').text()),
           type: (label.match(/Parts Sociales/) ? 'liability' : 'bank'),
-          number: $(item).attr('data-value')
+          number: $(item).data('value')
         }
       })
 
