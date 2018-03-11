@@ -100,7 +100,7 @@ function fetchIBANs (accounts) {
         }).then($ => {
           const iban = $('.row').eq(12).children('div').eq(1).text().trim()
           return Promise.resolve({
-            iban: iban,
+            iban,
             ...account
           })
         })
