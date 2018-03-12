@@ -58,6 +58,7 @@ function parseAccounts () {
         // NOTE It is possible that the user has given their account a pseudo
         const label = $(item).children('div').eq(0).text().trim()
         return {
+          institutionLabel: 'La Nef',
           label,
           balance: parseAmount($(item).find('.pc-formatted-amount-value').text()),
           type: (label.match(/Parts Sociales/) ? 'liability' : 'bank'),
@@ -65,12 +66,7 @@ function parseAccounts () {
         }
       })
 
-    return Promise.resolve(accounts.map(account => {
-      return {
-        institutionLabel: 'La Nef',
-        ...account
-      }
-    }))
+    return Promise.resolve(accounts)
   })
 }
 
@@ -98,9 +94,8 @@ function fetchIBANs (accounts) {
             ...params
           }
         }).then($ => {
-          const iban = $('.row').eq(12).children('div').eq(1).text().trim()
           return Promise.resolve({
-            iban,
+            iban: $('.row').eq(12).children('div').eq(1).text().trim(),
             ...account
           })
         })
@@ -133,9 +128,7 @@ function fetchOperations (account) {
   return rq({
     uri: `${baseUrl}/account/accountActivityListWidget.cfm`,
     method: 'POST',
-    form: {
-      ...params
-    }
+    form: params
   }).then($ => {
     const rows = Array.from($('table tbody').children('tr.activity-data-rows'))
     return Promise.resolve(
