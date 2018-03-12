@@ -34,7 +34,7 @@ function start (fields) {
   )
 }
 
-function validateLogin (statusCode, $, json) {
+function validateLogin (statusCode, $) {
   return $('#welcomebar').length === 1
 }
 
@@ -45,7 +45,7 @@ function login (fields) {
     'USERID': fields.login,
     'STATIC': fields.password
   }
-  return connection.init(`${baseUrl}/logon`, page, '#formSignon', population, validateLogin)
+  return connection.init(`${baseUrl}/logon`, page, '#formSignon', population, validateLogin, 'cheerio')
 }
 
 function parseAccounts () {

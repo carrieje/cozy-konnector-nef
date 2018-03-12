@@ -1,41 +1,63 @@
 'use strict'
-const {requestFactory, errors} = require('cozy-konnector-libs')
+const {errors, log, requestFactory} = require('cozy-konnector-libs')
 const cheerio = require('cheerio')
 
-const rq = requestFactory({
-  cheerio: true,
-  jar: true,
-  json: false
-})
+module.exports.init = function (
+  baseUrl,
+  page,
+  formSelector,
+  population,
+  validate = defaultValidate,
+  parseStrategy = 'raw',
+  opts = {}) {
 
-const defaultValidate = function (statusCode, $, json) {
-  return statusCode === 200
-}
+  const defaultOpts = { jar: true, cheerio: true, json: false }
 
-module.exports.init = function (baseUrl, page, formSelector, population, validate = defaultValidate) {
+  const rq = requestFactory({
+    ...opts,
+    ...defaultOpts
+  })
+
+  const parseBody = defineStrategy(parseStrategy)
+
   return rq(`${baseUrl}/${page}`)
   .then($ => {
-    const [action, inputs] = formContent($, formSelector)
+    const [action, inputs] = parseForm($, formSelector)
     for (let name in population) {
       inputs[name] = population[name]
     }
 
-    let body, statusCode
-    return post(`${baseUrl}/${action}`, inputs, (e, r, b) => {
-      [statusCode, body] = [r.statusCode, b]
-    }).then(() => { return Promise.resolve([statusCode, body]) })
+    return submitForm(rq, `${baseUrl}/${action}`, inputs, parseBody)
   })
-  .then(([statusCode, body]) => {
-    const $ = cheerio.load(body)
-    if (!validate(statusCode, $, body)) {
+  .then(([statusCode, parsedBody]) => {
+    if (!validate(statusCode, parsedBody)) {
       throw new Error(errors.LOGIN_FAILED)
     } else {
-      return Promise.resolve($)
+      return Promise.resolve(parsedBody)
     }
   })
 }
 
-function formContent ($, formSelector) {
+function defaultValidate (statusCode, body) {
+  return statusCode === 200
+}
+
+function defineStrategy (parseStrategy) {
+  switch (parseStrategy) {
+    case 'cheerio':
+      return cheerio.load
+    case 'json':
+      return JSON.parse
+    default:
+      let err = `connection: parsing strategy ${parseStrategy} unknown. `
+      let fallback = 'Falling back to `raw`. Use one of `raw`, `cheerio` or `json`'
+      log('warn', err + fallback)
+    case 'raw':
+      return (body) => body
+  }
+}
+
+function parseForm ($, formSelector) {
   const action = $(formSelector).attr('action')
   const inputs = {}
   const arr = $(formSelector).serializeArray()
@@ -45,13 +67,13 @@ function formContent ($, formSelector) {
   return [action, inputs]
 }
 
-function post (uri, inputs, callback) {
+function submitForm (rq, uri, inputs, parseBody) {
   return rq({
     uri: uri,
-    resolveWithFullResponse: true,
     method: 'POST',
     form: {
       ...inputs
-    }
-  }, callback)
+    },
+    transform: (body, response) => [response.statusCode, parseBody(body)]
+  })
 }
