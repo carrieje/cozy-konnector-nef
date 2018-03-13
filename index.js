@@ -7,7 +7,6 @@ const {
   updateOrCreate
 } = require('cozy-konnector-libs')
 const connection = require('./connection')
-const bluebird = require('bluebird')
 const moment = require('moment-timezone')
 moment.locale('fr')
 moment.tz.setDefault('Europe/Paris')
@@ -27,10 +26,10 @@ function start (fields) {
   .then(fetchIBANs)
   .then(saveAccounts)
   .then(accounts =>
-    bluebird.each(accounts, account => {
-      return fetchOperations(account)
-        .then(saveOperations)
-    })
+    Promise.all(accounts.map(account =>
+      fetchOperations(account)
+      .then(saveOperations)
+    ))
   )
 }
 
