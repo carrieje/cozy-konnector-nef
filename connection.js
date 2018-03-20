@@ -52,6 +52,7 @@ function defineStrategy (parseStrategy) {
       let err = `connection: parsing strategy ${parseStrategy} unknown. `
       let fallback = 'Falling back to `raw`. Use one of `raw`, `cheerio` or `json`'
       log('warn', err + fallback)
+      break
     case 'raw':
       return (body) => body
   }
