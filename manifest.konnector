@@ -3,7 +3,7 @@
   "name": "Nef",
   "type": "node",
   "slug": "nef",
-  "source": "git://github.com/carrieje/cozy-konnector-nef.git",
+  "source": "git://github.com/konnectors/cozy-konnector-nef.git",
   "fields": {
     "account": {
       "doctype": "io.cozy.accounts",
@@ -16,7 +16,7 @@
       "description": "Récupère vos operation bancaires",
       "permissions": {
         "bank accounts": {
-          "description": "Utilisé pour sauvegarder le liste de vos comptes bancaires"
+          "description": "Utilisé pour sauvegarder la liste de vos comptes bancaires"
         }
       }
     },
