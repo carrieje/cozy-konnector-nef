@@ -6,7 +6,22 @@ module.exports = {
   target: 'node',
   output: {
     path: path.join(__dirname, 'build'),
-    filename: 'konnector.js'
+    filename: 'index.js'
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              plugins: 'transform-object-rest-spread'
+            }
+          }
+        ]
+      }
+    ]
   },
   plugins: [
     new CopyPlugin([
