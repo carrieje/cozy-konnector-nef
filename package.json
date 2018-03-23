@@ -18,16 +18,11 @@
   "eslintIgnore": [
     "build"
   ],
-  "prettier": {
-    "semi": false,
-    "singleQuote": true
-  },
   "scripts": {
     "start": "node ./src/index.js",
     "dev": "cozy-konnector-dev build/index.js",
     "standalone": "cozy-konnector-standalone build/index.js",
     "build": "webpack",
-    "format": "prettier --write '**/*.{js,json}'",
     "precommit": "yarn lint",
     "lint": "eslint --fix .",
     "deploy": "git-directory-deploy --directory build/ --branch build --repo=${DEPLOY_REPOSITORY:-https://$GITHUB_TOKEN@github.com/konnectors/cozy-konnector-nef.git}",
@@ -46,7 +41,6 @@
     "eslint-config-cozy-app": "0.5.1",
     "git-directory-deploy": "1.5.1",
     "husky": "0.14.3",
-    "prettier": "1.11.1",
     "webpack": "4.2.0",
     "webpack-cli": "2.0.13"
   }
