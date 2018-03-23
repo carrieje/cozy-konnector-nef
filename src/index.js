@@ -4,7 +4,7 @@
 // In the future, will be set by the stack
 process.env.SENTRY_DSN =
   process.env.SENTRY_DSN ||
-'https://d76719f817944d2c922d93a39f72a233:727212fa092f47bc95f8ee7fc3be3b3e@sentry.cozycloud.cc/28'
+  'https://d76719f817944d2c922d93a39f72a233:727212fa092f47bc95f8ee7fc3be3b3e@sentry.cozycloud.cc/28'
 
 const {
   BaseKonnector,
@@ -27,56 +27,68 @@ const rq = requestFactory({
   cheerio: true
 })
 
-function start (fields) {
+function start(fields) {
   return login(fields)
-  .then(parseAccounts)
-  .then(fetchIBANs)
-  .then(saveAccounts)
-  .then(accounts =>
-    Promise.all(accounts.map(account =>
-      fetchOperations(account)
-      .then(saveOperations)
-    ))
-  )
+    .then(parseAccounts)
+    .then(fetchIBANs)
+    .then(saveAccounts)
+    .then(accounts =>
+      Promise.all(
+        accounts.map(account => fetchOperations(account).then(saveOperations))
+      )
+    )
 }
 
-function validateLogin (statusCode, $) {
+function validateLogin(statusCode, $) {
   return $('#welcomebar').length === 1
 }
 
-function login (fields) {
+function login(fields) {
   log('info', 'Logging in')
   const page = 'logon.cfm'
   const population = {
-    'USERID': fields.login,
-    'STATIC': fields.password
+    USERID: fields.login,
+    STATIC: fields.password
   }
-  return connection.init(`${baseUrl}/logon`, page, '#formSignon', population, validateLogin, 'cheerio')
+  return connection.init(
+    `${baseUrl}/logon`,
+    page,
+    '#formSignon',
+    population,
+    validateLogin,
+    'cheerio'
+  )
 }
 
-function parseAccounts () {
+function parseAccounts() {
   log('info', 'Gettings accounts')
 
-  return rq(`${baseUrl}/landingPage/accountListWidget.cfm`)
-  .then($ => {
-    const accounts = Array.from($('#accountList li'))
-      .map(item => {
-        // NOTE It is possible that the user has given their account a pseudo
-        const label = $(item).children('div').eq(0).text().trim()
-        return {
-          institutionLabel: 'La Nef',
-          label,
-          balance: parseAmount($(item).find('.pc-formatted-amount-value').text()),
-          type: (label.match(/Parts Sociales/) ? 'liability' : 'bank'),
-          number: $(item).data('value')
-        }
-      })
+  return rq(`${baseUrl}/landingPage/accountListWidget.cfm`).then($ => {
+    const accounts = Array.from($('#accountList li')).map(item => {
+      // NOTE It is possible that the user has given their account a pseudo
+      const label = $(item)
+        .children('div')
+        .eq(0)
+        .text()
+        .trim()
+      return {
+        institutionLabel: 'La Nef',
+        label,
+        balance: parseAmount(
+          $(item)
+            .find('.pc-formatted-amount-value')
+            .text()
+        ),
+        type: label.match(/Parts Sociales/) ? 'liability' : 'bank',
+        number: $(item).data('value')
+      }
+    })
 
     return Promise.resolve(accounts)
   })
 }
 
-function fetchIBANs (accounts) {
+function fetchIBANs(accounts) {
   log('info', 'Fetching IBANs')
 
   const params = {
@@ -101,7 +113,12 @@ function fetchIBANs (accounts) {
           }
         }).then($ => {
           return Promise.resolve({
-            iban: $('.row').eq(12).children('div').eq(1).text().trim(),
+            iban: $('.row')
+              .eq(12)
+              .children('div')
+              .eq(1)
+              .text()
+              .trim(),
             ...account
           })
         })
@@ -110,17 +127,22 @@ function fetchIBANs (accounts) {
   )
 }
 
-function saveAccounts (accounts) {
-  return updateOrCreate(accounts, 'io.cozy.bank.accounts', ['institutionLabel', 'number'])
+function saveAccounts(accounts) {
+  return updateOrCreate(accounts, 'io.cozy.bank.accounts', [
+    'institutionLabel',
+    'number'
+  ])
 }
 
-function fetchOperations (account) {
+function fetchOperations(account) {
   log('info', `Gettings operations for ${account.label} over the last 10 years`)
 
   const params = {
     AccNum: account.number,
     uniqueKey: `detailContent_${account.number}`,
-    startDate: moment().subtract(10, 'year').format('YYYY-MM-DD'),
+    startDate: moment()
+      .subtract(10, 'year')
+      .format('YYYY-MM-DD'),
     endDate: moment().format('YYYY-MM-DD'),
     orderBy: 'TRANSACTION_DATE_DESCENDING',
     page: '1',
@@ -139,7 +161,11 @@ function fetchOperations (account) {
     const rows = Array.from($('table tbody').children('tr.activity-data-rows'))
     return Promise.resolve(
       rows.map(row => {
-        const cells = Array.from($(row).children('td')).map(cell => $(cell).text().trim())
+        const cells = Array.from($(row).children('td')).map(cell =>
+          $(cell)
+            .text()
+            .trim()
+        )
         return {
           label: cells[5],
           type: 'none', // TODO parse the labels for that
@@ -154,14 +180,19 @@ function fetchOperations (account) {
   })
 }
 
-function saveOperations (operations) {
+function saveOperations(operations) {
   return addData(operations, 'io.cozy.bank.operations')
 }
 
-function parseAmount (amount) {
-  return parseFloat(amount.trim().replace('\xa0', '').replace(',', '.'))
+function parseAmount(amount) {
+  return parseFloat(
+    amount
+      .trim()
+      .replace('\xa0', '')
+      .replace(',', '.')
+  )
 }
 
-function parseDate (date) {
+function parseDate(date) {
   return moment.tz(date, 'D MMM YYYY', 'Europe/Paris').format()
 }

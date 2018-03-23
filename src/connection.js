@@ -1,16 +1,16 @@
 'use strict'
-const {errors, log, requestFactory} = require('cozy-konnector-libs')
+const { errors, log, requestFactory } = require('cozy-konnector-libs')
 const cheerio = require('cheerio')
 
-module.exports.init = function (
+module.exports.init = function(
   baseUrl,
   page,
   formSelector,
   population,
   validate = defaultValidate,
   parseStrategy = 'raw',
-  opts = {}) {
-
+  opts = {}
+) {
   const defaultOpts = { jar: true, cheerio: true, json: false }
 
   const rq = requestFactory({
@@ -21,44 +21,46 @@ module.exports.init = function (
   const parseBody = defineStrategy(parseStrategy)
 
   return rq(`${baseUrl}/${page}`)
-  .then($ => {
-    const [action, inputs] = parseForm($, formSelector)
-    for (let name in population) {
-      inputs[name] = population[name]
-    }
+    .then($ => {
+      const [action, inputs] = parseForm($, formSelector)
+      for (let name in population) {
+        inputs[name] = population[name]
+      }
 
-    return submitForm(rq, `${baseUrl}/${action}`, inputs, parseBody)
-  })
-  .then(([statusCode, parsedBody]) => {
-    if (!validate(statusCode, parsedBody)) {
-      throw new Error(errors.LOGIN_FAILED)
-    } else {
-      return Promise.resolve(parsedBody)
-    }
-  })
+      return submitForm(rq, `${baseUrl}/${action}`, inputs, parseBody)
+    })
+    .then(([statusCode, parsedBody]) => {
+      if (!validate(statusCode, parsedBody)) {
+        throw new Error(errors.LOGIN_FAILED)
+      } else {
+        return Promise.resolve(parsedBody)
+      }
+    })
 }
 
-function defaultValidate (statusCode, body) {
+function defaultValidate(statusCode) {
   return statusCode === 200
 }
 
-function defineStrategy (parseStrategy) {
+function defineStrategy(parseStrategy) {
   switch (parseStrategy) {
     case 'cheerio':
       return cheerio.load
     case 'json':
       return JSON.parse
     default:
-      let err = `connection: parsing strategy ${parseStrategy} unknown. `
-      let fallback = 'Falling back to `raw`. Use one of `raw`, `cheerio` or `json`'
-      log('warn', err + fallback)
+      log(
+        'warn',
+        `connection: parsing strategy ${parseStrategy} unknown. ` +
+          'Falling back to `raw`. Use one of `raw`, `cheerio` or `json`'
+      )
       break
     case 'raw':
-      return (body) => body
+      return body => body
   }
 }
 
-function parseForm ($, formSelector) {
+function parseForm($, formSelector) {
   const action = $(formSelector).attr('action')
   const inputs = {}
   const arr = $(formSelector).serializeArray()
@@ -68,7 +70,7 @@ function parseForm ($, formSelector) {
   return [action, inputs]
 }
 
-function submitForm (rq, uri, inputs, parseBody) {
+function submitForm(rq, uri, inputs, parseBody) {
   return rq({
     uri: uri,
     method: 'POST',

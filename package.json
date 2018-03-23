@@ -29,7 +29,7 @@
     "build": "webpack",
     "format": "prettier --write '**/*.{js,json}'",
     "precommit": "yarn lint",
-    "lint": "eslint .",
+    "lint": "eslint --fix .",
     "deploy": "git-directory-deploy --directory build/ --branch build --repo=${DEPLOY_REPOSITORY:-https://$GITHUB_TOKEN@github.com/konnectors/cozy-konnector-nef.git}",
     "deploy:prod": "git-directory-deploy --directory build/ --branch latest --repo=${DEPLOY_REPOSITORY:-https://$GITHUB_TOKEN@github.com/konnectors/cozy-konnector-nef.git}"
   },
@@ -43,7 +43,7 @@
     "babel-plugin-transform-object-rest-spread": "6.26.0",
     "copy-webpack-plugin": "4.5.1",
     "eslint": "4.19.1",
-    "eslint-config-cozy-app": "0.4.0",
+    "eslint-config-cozy-app": "0.5.1",
     "git-directory-deploy": "1.5.1",
     "husky": "0.14.3",
     "prettier": "1.11.1",
