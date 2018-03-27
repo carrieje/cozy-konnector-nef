@@ -29,7 +29,7 @@
     "deploy:prod": "git-directory-deploy --directory build/ --branch latest --repo=${DEPLOY_REPOSITORY:-https://$GITHUB_TOKEN@github.com/konnectors/cozy-konnector-nef.git}"
   },
   "dependencies": {
-    "cozy-konnector-libs": "3.7.4",
+    "cozy-konnector-libs": "3.8.0",
     "moment-timezone": "^0.5.14"
   },
   "devDependencies": {
