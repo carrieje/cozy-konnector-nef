@@ -11,9 +11,9 @@ const {
   addData,
   log,
   requestFactory,
+  signin,
   updateOrCreate
 } = require('cozy-konnector-libs')
-const connection = require('./connection')
 const moment = require('moment-timezone')
 moment.locale('fr')
 moment.tz.setDefault('Europe/Paris')
@@ -39,25 +39,19 @@ function start(fields) {
     )
 }
 
-function validateLogin(statusCode, $) {
-  return $('#welcomebar').length === 1
-}
-
 function login(fields) {
   log('info', 'Logging in')
-  const page = 'logon.cfm'
-  const population = {
+  const formData = {
     USERID: fields.login,
     STATIC: fields.password
   }
-  return connection.init(
-    `${baseUrl}/logon`,
-    page,
-    '#formSignon',
-    population,
-    validateLogin,
-    'cheerio'
-  )
+  return signin({
+    url: `${baseUrl}/logon/logon.cfm`,
+    formSelector: '#formSignon',
+    formData,
+    parse: 'cheerio',
+    validate: (statusCode, $) => $('#welcomebar').length === 1
+  })
 }
 
 function parseAccounts() {
