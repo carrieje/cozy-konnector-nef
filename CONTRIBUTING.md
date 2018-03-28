@@ -23,7 +23,7 @@ Opening an issue is as easy as following [this link][issues] and filling out the
 - What did you try, step by step?
 - What did you expect?
 - What did happen instead?
-- What is the version of the Cozy Nef Konnector?
+- What is the version of the Cozy Konnector Nef?
 
 
 Pull Requests
@@ -36,6 +36,7 @@ Please keep in mind that:
 - You may add documentation in the `/docs` directory to explain your choices if needed
 - We recommend to use [task lists][checkbox] to explain steps / features in your Pull-Request description
 - you do _not_ need to build app to submit a PR
+- you should update the Transifex source locale file if you modify it for your feature needs (see [Localization section in README][localization])
 
 
 ### Workflow
@@ -47,7 +48,7 @@ Pull requests are the primary mechanism we use to change Cozy. GitHub itself has
 Fork the project on GitHub and [check out your copy locally][forking].
 
 ```
-$ git clone github.com/carrieje/cozy-konnector-nef.git
+$ git clone github.com/konnectors/cozy-konnector-nef.git
 $ cd cozy-konnector-nef
 $ git remote add fork git://github.com/yourusername/cozy-konnector-nef.git
 ```
@@ -109,6 +110,12 @@ Writing documentation
 Documentation improvements are very welcome. We try to keep a good documentation in the `/docs` folder. But, you know, we are developers, we can forget to document important stuff that look obvious to us. And documentation can always be improved.
 
 
+Translations
+------------
+
+The Cozy <APP_NAME> is translated on a platform called [Transifex][tx]. [This tutorial][tx-start] can help you to learn how to make your first steps here. If you have any question, don't hesitate to ask us!
+
+
 Community
 ---------
 
@@ -116,11 +123,14 @@ You can help us by making our community even more vibrant. For example, you can 
 
 
 
-[issues]: https://github.com/carrieje/cozy-konnector-nef/issues/new
+[issues]: https://github.com/konnectors/cozy-konnector-nef/issues/new
 [checkbox]: https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments
 [pr]: https://help.github.com/categories/collaborating-with-issues-and-pull-requests/
 [forking]: http://blog.campoy.cat/2014/03/github-and-go-forking-pull-requests-and.html
 [stdjs]: http://standardjs.com/
 [commitmsg]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
+[localization]: https://github.com/konnectors/cozy-konnector-nef/blob/master/README.md#localization
 [hub]: https://hub.github.com/
+[tx]: https://www.transifex.com/cozy/
+[tx-start]: http://docs.transifex.com/getting-started/translators/
 [forum]: https://forum.cozy.io/

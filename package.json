@@ -4,28 +4,45 @@
   "description": "",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/carrieje/cozy-konnector-nef.git"
+    "url": "git+https://github.com/konnectors/cozy-konnector-nef.git"
   },
   "keywords": [],
   "author": "",
   "license": "AGPL-3.0",
+  "main": "./src/index.js",
+  "eslintConfig": {
+    "extends": [
+      "eslint-config-cozy-app"
+    ]
+  },
+  "eslintIgnore": [
+    "build"
+  ],
+  "scripts": {
+    "start": "node ./src/index.js",
+    "dev": "cozy-konnector-dev build/index.js",
+    "standalone": "cozy-run-standalone build/index.js",
+    "build": "webpack",
+    "precommit": "yarn lint",
+    "lint": "eslint --fix .",
+    "deploy": "git-directory-deploy --directory build/ --branch build --repo=${DEPLOY_REPOSITORY:-https://$GITHUB_TOKEN@github.com/konnectors/cozy-konnector-nef.git}",
+    "deploy:prod": "git-directory-deploy --directory build/ --branch latest --repo=${DEPLOY_REPOSITORY:-https://$GITHUB_TOKEN@github.com/konnectors/cozy-konnector-nef.git}"
+  },
   "dependencies": {
-    "cozy-konnector-libs": "^3.2.5",
+    "cozy-konnector-libs": "3.8.0",
     "moment-timezone": "^0.5.14"
   },
-  "scripts": {
-    "start": "node index.js",
-    "dev": "cozy-konnector-dev",
-    "standalone": "cozy-konnector-standalone",
-    "build": "webpack",
-    "lint": "standard --fix konnector.js",
-    "deploy:travis": "git-directory-deploy --username <YOUR_GH_USERNAME> --email <YOUR_EMAIL> --directory build/ --repo=https://$GITHUB_TOKEN@github.com/<USERNAME_GH>/<SLUG_GH>.git",
-    "deploy": "git-directory-deploy --directory build/ --branch build --repo=https://github.com/carrieje/cozy-konnector-nef.git"
-  },
   "devDependencies": {
-    "copy-webpack-plugin": "^4.0.1",
-    "git-directory-deploy": "^1.5.1",
-    "standard": "^10.0.3",
-    "webpack": "^3"
+    "babel-core": "6.26.0",
+    "babel-loader": "7.1.4",
+    "babel-plugin-transform-object-rest-spread": "6.26.0",
+    "copy-webpack-plugin": "4.5.1",
+    "eslint": "4.19.1",
+    "eslint-config-cozy-app": "0.5.1",
+    "git-directory-deploy": "1.5.1",
+    "husky": "0.14.3",
+    "webpack": "4.3.0",
+    "cozy-jobs-cli": "1.0.7",
+    "webpack-cli": "2.0.13"
   }
 }
