@@ -21,7 +21,7 @@
   "scripts": {
     "start": "node ./src/index.js",
     "dev": "cozy-konnector-dev build/index.js",
-    "standalone": "cozy-konnector-standalone build/index.js",
+    "standalone": "cozy-run-standalone build/index.js",
     "build": "webpack",
     "precommit": "yarn lint",
     "lint": "eslint --fix .",
@@ -42,6 +42,7 @@
     "git-directory-deploy": "1.5.1",
     "husky": "0.14.3",
     "webpack": "4.3.0",
+    "cozy-jobs-cli": "1.0.7",
     "webpack-cli": "2.0.13"
   }
 }
